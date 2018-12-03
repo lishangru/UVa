@@ -1,42 +1,42 @@
-#include <stdio.h>
-
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int maxn = 1005;
+ 
+int lis[maxn], lds[maxn];
+int n, num[maxn];
+ 
 int main() {
-    int n, i, j, k;
-    int dish[105], A[105], B[105];
-    int la, lb, dpa[105], dpb[105];
-    int ta, tb, ans;
-    while(scanf("%d", &n) == 1 && n) {
-        for(i = 0; i < n; i++)
-            scanf("%d", &dish[i]);
-        ans = 0;
-        for(i = 0; i < n; i++) {
-            la = 0, lb = 0;
-            for(j = i+1; j < n; j++)
-                if(dish[j] > dish[i])
-                    A[la++] = dish[j];
-                else
-                    B[lb++] = dish[j];
-            for(j = 0; j < la; j++) {
-                dpa[j] = 1;
-                for(k = 0; k < j; k++)
-                    if(A[j] >= A[k] && dpa[j] < dpa[k]+1)
-                        dpa[j] = dpa[k]+1;
-            }
-            for(j = 0; j < lb; j++) {
-                dpb[j] = 1;
-                for(k = 0; k < j; k++)
-                    if(B[j] <= B[k] && dpb[j] < dpb[k]+1)
-                        dpb[j] = dpb[k]+1;
-            }
-            ta = 0, tb = 0;
-            for(j = 0; j < la; j++)
-                if(dpa[j] > ta) ta = dpa[j];
-            for(j = 0; j < lb; j++)
-                if(dpb[j] > tb) tb = dpb[j];
-            if(ta+tb+1 > ans)
-                ans = ta+tb+1;
-        }
-        printf("%d\n", ans);
-    }
-    return 0;
+	while (scanf("%d", &n) != EOF && n) {
+		memset(lis, 0, sizeof(lis));
+		memset(lds, 0, sizeof(lds));
+		for (int i = 1; i <= n; i++) 
+			scanf("%d", &num[i]);
+ 
+		for (int i = n; i >= 1; i--) {
+			lis[i] = lds[i] = 1;
+			for (int j = n; j > i; j--) {
+				if (num[i] >= num[j])
+					lds[i] = max(lds[i], lds[j] + 1);
+				if (num[i] <= num[j]) 
+					lis[i] = max(lis[i], lis[j] + 1);
+			}
+		}
+ 
+		int ans = -1;
+		for (int i = 1; i <= n; i++) {
+			ans = max(ans, max(lis[i], lds[i]));
+			for (int j = i+1; j <= n; j++) {
+				if (num[j] < num[i])
+					ans = max(ans, lis[i] + lds[j]);
+				else if (num[j] > num[i])
+					ans = max(ans, lds[i] + lis[j]);
+			}
+		}
+ 
+		printf("%d\n", ans);
+	}
+	return 0;
 }
